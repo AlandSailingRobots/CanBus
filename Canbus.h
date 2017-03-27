@@ -25,6 +25,8 @@ public:
 	void SetLoopBackMode();
 	void SetListenOnlyMode();
 	void SetConfigMode();
+	void SetMasksAndActivateFilters(uint32_t Mask1, uint32_t Mask2, bool RollOver);
+	void SetFilter(int FilterIndex, uint32_t Filter);
 	void SetFilterAndMask(int ReceiveBuffer, int FilterIndex, uint32_t Filter, uint32_t Mask);
 };
 
@@ -46,8 +48,9 @@ public:
 	//void SendISOAddressClaim(uint8_t Address, uint8_t Destination);
 
 	std::map<IDsID, N2kMsg> FastPKG_;
-	std::map<IDsID, uint8_t> BytesLeft_;		//< <MessageId, sequence id>, Bytes left>
+	std::map<IDsID, int> BytesLeft_;		//< <MessageId, sequence id>, Bytes left>
 	std::vector<N2kMsg> MessageQue_;
+	std::vector<CanMsg> MessageQue2_;
 	CanbusClass Canbus;
 
 

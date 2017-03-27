@@ -2,6 +2,15 @@
 #include "Canbus.h"
 #include <iostream>
 #include <fstream>
+#include <csignal>
+
+bool Running = true;
+void SHandler(int sig)
+{
+	(void)sig;
+	Running = false;
+}
+
 
 int main()
 {
@@ -21,13 +30,18 @@ int main()
 		std::cout << "Can't init NMEA2000\n";
 		return 0;
 	} 
-	uint8_t MF = (1<<7)|(1<<6);
+	uint32_t MF = ((1<<7)|(1<<6)) << 21;
+	N2kBus.Canbus.SetMasksAndActivateFilters(MF,0,1);
+	N2kBus.Canbus.SetFilter(0, MF);
+	N2kBus.Canbus.SetFilter(2, MF);
 	//N2kBus.Canbus.SetFilterAndMask(0, 0, (MF << 21), (MF << 21));		//only priority 6 and up in buffer 0
 	//N2kBus.Canbus.SetFilterAndMask(1, 2, (MF << 21), (MF << 21));		//only priority 6 and up in buffer 1
+	
+	signal(SIGINT, SHandler);	
 
 	while(true)
 	{
-		std::cout << "[S]end, [R]eceive, [L]og or [C]heck status?\n";
+		std::cout << "[S]end, [R]eceive, [L]og, [C]heck status or [Q]uit?\n";
 		int c = std::cin.get();
 		std::cin.ignore(200,'\n');
 		if(c == 'c' || c == 'C')
@@ -55,31 +69,32 @@ int main()
 		 		++i;
 		 	}
 		 	std::cin.ignore(200,'\n');
+		 		int Num = 0;
+		 		N2kBus.MessageQue_.reserve(100);
+				Running = true;
 
 		 	if(N2kBus.SendMessage(NMsg))
 		 	{
-		 		std::cout << "***Message sent***\n";
-		 		PrintNMEAMsg(NMsg);
-		 		int Num = 0;
+		 		//std::cout << "***Message sent***\n";
+		 		//PrintNMEAMsg(NMsg);
 		 		int Res = N2kBus.GetN2kMsg();
-		 		N2kBus.MessageQue_.reserve(100);
 				//while(Num > 0)
-				while(Num < 100)
+				//while(Num < 100)
 				//while(Res != -1)
-				//while(1)
+				while(Running)
 				{
 					if(Res == 1)
 					{
-						//N2kMsg NMsg = N2kBus.MessageQue_[0];
-						//N2kBus.MessageQue_.pop_back();
-						//PrintNMEAMsg(NMsg);
-						++Num;
-						//break;
+						N2kMsg NMsg = N2kBus.MessageQue_[0];
+						N2kBus.MessageQue_.pop_back();
+						PrintNMEAMsg(NMsg);
+						break;
 					}
-					// else if(Res == 0)
-					// {
+					else if(Res == 0)
+					{
+						++Num;
 					// 	//std::cout <<"Part of fast package\n";
-					// }
+					}
 //					else
 //					{
 //					 	std::cout <<"no message available\n";
@@ -91,12 +106,27 @@ int main()
 				std::ofstream out("log.txt", std::ofstream::out);
 				std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
 				std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
+				for(auto it = N2kBus.MessageQue2_.begin(); it != N2kBus.MessageQue2_.end(); ++it)
+				{
+					PrintMsg(*it);
+				}
+				std::cout << "FastPKG:\n";
+				for(auto it = N2kBus.FastPKG_.begin(); it != N2kBus.FastPKG_.end(); ++it)
+				{
+					PrintNMEAMsg(it->second);
+				}
+				for(auto it = N2kBus.BytesLeft_.begin(); it != N2kBus.BytesLeft_.end(); ++it)
+				{
+					std::cout << (int)it->second << std::endl;
+				}
+				std::cout << "Messages:\n";
 				for(auto it = N2kBus.MessageQue_.begin(); it != N2kBus.MessageQue_.end(); ++it)
 				{
 					PrintNMEAMsg(*it);
 				}
 				std::cout.rdbuf(coutbuf); //reset to standard output again
 				out.close();
+				N2kBus.MessageQue_.clear();
 		 	}
 		 	else
 		 	{
@@ -153,5 +183,7 @@ int main()
 			std::cout.rdbuf(coutbuf); //reset to standard output again
 			out.close();
 		}
+		if(c == 'q' || c == 'Q')
+			return 1;
 	}
 }

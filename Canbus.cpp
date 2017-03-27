@@ -41,6 +41,7 @@ int NMEA2000Bus::GetN2kMsg()		//-1: no message avaliable, 0: fast pakage, 1: mes
 		if(IsFastPackage(NMsg))
 		{
 			bool FullMsg = ParseFastPKG(Msg, NMsg);
+			MessageQue2_.push_back(Msg);
 			if(FullMsg)							//if we have received the whole message
 			{
 				MessageQue_.push_back(NMsg);
@@ -77,11 +78,22 @@ bool NMEA2000Bus::ParseFastPKG(CanMsg &Msg, N2kMsg &NMsg)		//return true and ove
 #ifdef VERBOSE
 		std::cout << "Fast package, SID: "<< (int)(Msg.data[0]&0xE0) <<", SequenceNumber: " << (int)SequenceNumber << ", Bytesleft: " << (int)it->second << std::endl;
 #endif
-		it->second -= 7;				//decrease bytes left
-		for(int i = 1; i < 8; ++i)
+		int LastByte;
+		if(it->second >= 7)		//check if less than 7 bytes left, 1st byte is the sequence ID and Sequence number followed by 7 bytes of data
+		{
+			LastByte = 8;
+		}
+		else
+		{
+			LastByte = it->second +1;
+		}
+
+		for(int i = 1; i < LastByte; ++i)
 		{
 			FastPKG_[Key].Data[6+(SequenceNumber-1)*7 +i] = Msg.data[i];
 		}
+		it->second -= 7;				//decrease bytes left
+
 		if(it->second <= 0)				//have the whole message
 		{
 			NMsg = FastPKG_[Key];
@@ -111,7 +123,7 @@ bool NMEA2000Bus::ParseFastPKG(CanMsg &Msg, N2kMsg &NMsg)		//return true and ove
 		}
 		else
 		{
-			BytesLeft_[Key] = BytesInMsg;		//how many bytes left
+			BytesLeft_[Key] = BytesInMsg-6;		//how many bytes left
 			FastPKG_[Key] = NMsg;
 			return false;
 		}
@@ -270,9 +282,87 @@ void CanbusClass::SetConfigMode()
 		Status = MCP2515_Read(CANSTAT);
 	}
 }
+void CanbusClass::SetMasksAndActivateFilters(uint32_t Mask1, uint32_t Mask2, bool RollOver)
+{
+	if(Mask1)
+	{
+		SetConfigMode();
+		MCP2515_Write(RXB0CTRL, (0<<RXM1) | (0<<RXM0) | (RollOver<<BUKT));	//make filters active on buffer 0
+		MCP2515_Write(RXM0SIDH, Mask1>>21);
+		MCP2515_Write(RXM0SIDL, ((Mask1>>13) & 0xE0) | ((Mask1>>16) & 0x03));
+		MCP2515_Write(RXM0EID8, Mask1>>8);
+		MCP2515_Write(RXM0EID0, Mask1);
+		SetNormalMode();
+	}
+	if(Mask2)
+	{
+		SetConfigMode();
+		MCP2515_Write(RXB1CTRL, (0<<RXM1) | (0<<RXM0));	//make filters active on buffer 1
+		MCP2515_Write(RXM1SIDH, Mask2>>21);
+		MCP2515_Write(RXM1SIDL, ((Mask2>>13) & 0xE0) | ((Mask2>>16) & 0x03));
+		MCP2515_Write(RXM1EID8, Mask2>>8);
+		MCP2515_Write(RXM1EID0, Mask2);
+		SetNormalMode();
+	}
+}
+void CanbusClass::SetFilter(int FilterIndex, uint32_t Filter)
+{
+	uint8_t FSIDH, FSIDL, FEID8, FEID0;
+	switch(FilterIndex)
+	{
+		case 0:
+			FSIDH = RXF0SIDH;
+			FSIDL = RXF0SIDL;
+			FEID8 = RXF0EID8;
+			FEID0 = RXF0EID0;
+			break;
+		case 1:
+			FSIDH = RXF1SIDH;
+			FSIDL = RXF1SIDL;
+			FEID8 = RXF1EID8;
+			FEID0 = RXF1EID0;
+			break;
+		case 2:
+			FSIDH = RXF2SIDH;
+			FSIDL = RXF2SIDL;
+			FEID8 = RXF2EID8;
+			FEID0 = RXF2EID0;
+			break;
+		case 3:
+			FSIDH = RXF3SIDH;
+			FSIDL = RXF3SIDL;
+			FEID8 = RXF3EID8;
+			FEID0 = RXF3EID0;
+			break;
+		case 4:
+			FSIDH = RXF4SIDH;
+			FSIDL = RXF4SIDL;
+			FEID8 = RXF4EID8;
+			FEID0 = RXF4EID0;
+			break;
+		case 5:
+			FSIDH = RXF5SIDH;
+			FSIDL = RXF5SIDL;
+			FEID8 = RXF5EID8;
+			FEID0 = RXF5EID0;
+			break;
+#ifdef VERBOSE
+		default: std::cout << "Not a valid filter\n";
+#endif
+	}
+
+	SetConfigMode();	
+	MCP2515_Write(FSIDH, Filter>>21);
+	MCP2515_Write(FSIDL, ((Filter>>13) & 0xE0) | (1<<EXIDE) | ((Filter>>16) & 0x03));
+	MCP2515_Write(FEID8, Filter>>8);
+	MCP2515_Write(FEID0, Filter);
+	SetNormalMode();
+}
+
+
 void CanbusClass::SetFilterAndMask(int ReceiveBuffer, int FilterIndex, uint32_t Filter, uint32_t Mask)
 {
-	uint8_t FSIDH, FSIDL, FEID8, FEID0, MSIDH, MSIDL, MEID8, MEID0, RXBCTRL;
+	uint8_t FSIDH, FSIDL, FEID8, FEID0, MSIDH, MSIDL, MEID8, MEID0;
 	switch(FilterIndex)
 	{
 		case 0:
@@ -321,7 +411,6 @@ void CanbusClass::SetFilterAndMask(int ReceiveBuffer, int FilterIndex, uint32_t 
 		MSIDL = RXM0SIDL;
 		MEID8 = RXM0EID8;
 		MEID0 = RXM0EID0;
-		RXBCTRL = RXB0CTRL;
 	}
 	else if(ReceiveBuffer == 1)
 	{
@@ -329,7 +418,6 @@ void CanbusClass::SetFilterAndMask(int ReceiveBuffer, int FilterIndex, uint32_t 
 		MSIDL = RXM1SIDL;
 		MEID8 = RXM1EID8;
 		MEID0 = RXM1EID0;
-		RXBCTRL = RXB1CTRL;
 	}
 	else
 	{
@@ -341,7 +429,6 @@ void CanbusClass::SetFilterAndMask(int ReceiveBuffer, int FilterIndex, uint32_t 
 
 	MCP2515_Write(RXB0CTRL, (0<<RXM1) | (0<<RXM0) | (1<<BUKT));	//make filters active on buffer 0
 	MCP2515_Write(RXB1CTRL, (0<<RXM1) | (0<<RXM0));	//make filters active on buffer 1
-//	MCP2515_Write(RXBCTRL, (0<<RXM1) | (0<<RXM0));	//make filters active on selected buffer
 	MCP2515_Write(MSIDH, Mask>>21);
 	MCP2515_Write(MSIDL, ((Mask>>13) & 0xE0) | ((Mask>>16) & 0x03));
 	MCP2515_Write(MEID8, Mask>>8);
@@ -351,15 +438,6 @@ void CanbusClass::SetFilterAndMask(int ReceiveBuffer, int FilterIndex, uint32_t 
 	MCP2515_Write(FSIDL, ((Filter>>13) & 0xE0) | (1<<EXIDE) | ((Filter>>16) & 0x03));
 	MCP2515_Write(FEID8, Filter>>8);
 	MCP2515_Write(FEID0, Filter);
-
-//	MCP2515_Write(FSIDH, (1<<7)|(1<<6));
-//	MCP2515_Write(FSIDL, (1<<EXIDE));
-//	MCP2515_Write(FEID8, 0);
-//	MCP2515_Write(FEID0, 0);
-//	MCP2515_Write(MSIDH, (1<<7)|(1<<6));
-//	MCP2515_Write(MSIDL, 0);
-//	MCP2515_Write(MEID8, 0);
-//	MCP2515_Write(MEID0, 0);
 
 	SetNormalMode();
 }

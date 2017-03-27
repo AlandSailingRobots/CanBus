@@ -158,12 +158,25 @@ void PrintNMEAMsg(N2kMsg &NMsg)
 		ParsePGN126996(NMsg, N2kV, PC, MID, SVC, MV, MSC, CL, LE);
 		std::cout << "NMEA2000 Version: " << (int)N2kV << " ";
 		std::cout << "ProductCode: " << (int)PC << " ";
-		std::cout << "ModelID: " << MID << " ";
-		std::cout << "SoftwareVersionCode: " << SVC << " ";
-		std::cout << "ModelVersion: " << MV << " ";
-		std::cout << "ModelSerialCode: " << MSC << " ";
-		std::cout << "CertificationLevel: " << (int)CL << " ";
-		std::cout << "LoadEquivalency: " << (int)LE << std::endl;
+
+//		std::cout << "ModelID: " << MID;
+//		std::cout << " SoftwareVersionCode: " << SVC;
+//		std::cout << " ModelVersion: " << MV;
+//		std::cout << " ModelSerialCode: " << MSC;
+		std::cout << "ModelID: ";
+		for(int i = 0; i < 32; ++i)
+			std::cout << MID[i];
+		std::cout << " SoftwareVersionCode: ";
+		for(int i = 0; i < 32; ++i)
+			std::cout << SVC[i];
+		std::cout << " ModelVersion: ";
+		for(int i = 0; i < 32; ++i)
+			std::cout << MV[i];
+		std::cout << " ModelSerialCode: ";
+		for(int i = 0; i < 32; ++i)
+			std::cout << MSC[i];
+		std::cout << " CertificationLevel: " << (int)CL;
+		std::cout << " LoadEquivalency: " << (int)LE << std::endl;
 	}
 	else
 	{
@@ -212,10 +225,14 @@ void ParsePGN126996(N2kMsg &NMsg, uint16_t &NMEA2000Version,			//Product Informa
 	ProductCode = NMsg.Data[2] | (NMsg.Data[3]<<8);
 	for(int i = 0; i < 32; ++i)
 	{
-		ModelID[i] = NMsg.Data[4+31 - i];
-		SoftwareVersionCode[i] = NMsg.Data[36+31 - i];
-		ModelVersion[i] = NMsg.Data[68+31 - i];
-		ModelSerialCode[i] = NMsg.Data[100+31 - i];
+//		ModelID[i] = NMsg.Data[4+31 - i];
+//		SoftwareVersionCode[i] = NMsg.Data[36+31 - i];
+//		ModelVersion[i] = NMsg.Data[68+31 - i];
+//		ModelSerialCode[i] = NMsg.Data[100+31 - i];
+		ModelID[i] = NMsg.Data[4 +i];
+		SoftwareVersionCode[i] = NMsg.Data[36 +i];
+		ModelVersion[i] = NMsg.Data[68 +i];
+		ModelSerialCode[i] = NMsg.Data[100 +i];
 	}
 	CertificationLevel = NMsg.Data[132];
 	LoadEquivalency = NMsg.Data[133];
