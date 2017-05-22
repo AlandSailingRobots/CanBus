@@ -51,45 +51,65 @@ void PrintMsg(CanMsg &Msg)
 	{
 		N2kMsg NMsg;
 		IdToN2kMsg(NMsg, Msg.id);
-		std::cout << std::hex << Msg.id  <<" ";
-		std::cout << std::dec << NMsg.PGN << " ";
-		std::cout << "Priority: "<<(int)NMsg.Priority << " ";
-		std::cout << "Source: "<<(int)NMsg.Source << " ";
-		std::cout << "Destination: "<<(int)NMsg.Destination << " ";
-		std::cout << "DataLen: "<<(int)Msg.header.length << " ";
+		// std::cout << std::hex << Msg.id  <<" ";
+		// std::cout << std::dec << NMsg.PGN << " ";
+		// std::cout << "Priority: "<<(int)NMsg.Priority << " ";
+		// std::cout << "Source: "<<(int)NMsg.Source << " ";
+		// std::cout << "Destination: "<<(int)NMsg.Destination << " ";
+		// std::cout << "DataLen: "<<(int)Msg.header.length << " ";
+		Serial.print(Msg.id,HEX);
+		Serial.print(" ");
+		Serial.print(Msg.PGN);
+		Serial.print(" Priority: ");Serial.print((int)NMsg.Priority);
+		Serial.print(" Source: ");Serial.print((int)NMsg.Source);
+		Serial.print(" Destination: ");Serial.print((int)NMsg.Destination);
+		Serial.print(" DataLen: ");Serial.print((int)Msg.header.length); Serial.print(" ");
+
 
 		for(int i = 0; i < Msg.header.length; ++i)
 		{ 
-			std::cout << std::hex << (int)Msg.data[i] << " ";
+			//std::cout << std::hex << (int)Msg.data[i] << " ";
+			Serial.print((int)Msg.data[i], HEX); Serial.print(" ");
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
+		Serial.println("");
 	}
 	else
 	{
-		std::cout << "Message not extended format\n";
+		//std::cout << "Message not extended format\n";
+		Serial.println("Message not extended format");
 	}
 }
 void PrintNMEAMsg(N2kMsg &NMsg)
 {
-	std::cout << std::dec << NMsg.PGN << " ";
-	std::cout << "Priority: "<<(int)NMsg.Priority << " ";
-	std::cout << "Source: "<<(int)NMsg.Source << " ";
-	std::cout << "Destination: "<<(int)NMsg.Destination << " ";
-	std::cout << "DataLen: "<<NMsg.DataLen << " ";
+	// std::cout << std::dec << NMsg.PGN << " ";
+	// std::cout << "Priority: "<<(int)NMsg.Priority << " ";
+	// std::cout << "Source: "<<(int)NMsg.Source << " ";
+	// std::cout << "Destination: "<<(int)NMsg.Destination << " ";
+	// std::cout << "DataLen: "<<NMsg.DataLen << " ";
+	Serial.print(Msg.PGN);
+	Serial.print(" Priority: ");	Serial.print((int)NMsg.Priority);
+	Serial.print(" Source: ");		Serial.print((int)NMsg.Source);
+	Serial.print(" Destination: ");	Serial.print((int)NMsg.Destination);
+	Serial.print(" DataLen: ");		Serial.print((int)NMsg.DataLen); Serial.print(" ");
 	if(NMsg.PGN == 59392)
 	{
 		uint8_t Con, GF;
 		uint32_t PGN;
 		ParsePGN59392(NMsg, Con, GF, PGN);
-		std::cout << "Controll: " << (int)Con << " ";
-		std::cout << "GroupFunction: "<< (int)GF << " ";
-		std::cout << "PGN: "<< PGN << std::endl;
+		// std::cout << "Controll: " << (int)Con << " ";
+		// std::cout << "GroupFunction: "<< (int)GF << " ";
+		// std::cout << "PGN: "<< PGN << std::endl;
+		Serial.print("Controll: ");		Serial.println((int)Con);
+		Serial.print(" GroupFunction: ");Serial.println((int)GF));
+		Serial.print(" PGN: ");			Serial.println(PGN);
 	}
 	else if(NMsg.PGN == 59904)
 	{
 		uint32_t PGN;
 		ParsePGN59904(NMsg, PGN);
-		std::cout << "PGN: "<< PGN << std::endl;
+		//std::cout << "PGN: "<< PGN << std::endl;
+		Serial.print("PGN: ");			Serial.println(PGN);
 	}
 	else if(NMsg.PGN == 60928)
 	{
@@ -98,14 +118,22 @@ void PrintNMEAMsg(N2kMsg &NMsg)
 		uint8_t DI, DF, DC, SI, IC;
 		bool AAC;
 		ParsePGN60928(NMsg, UN, MC, DI, DF, DC, SI, IC, AAC);
-		std::cout << "UniqueNumber: " << UN << " ";
-		std::cout << "ManufacturerCode: "<< MC << " ";
-		std::cout << "DeviceInstance: "<< (int)DI << " ";
-		std::cout << "DeviceFunction: "<< (int)DF << " ";
-		std::cout << "DeviceClass: "<< (int)DC << " ";
-		std::cout << "SystemInstance: "<< (int)SI << " ";
-		std::cout << "IndustryCode: "<< (int)IC << " ";
-		std::cout << "ArbitraryAddressCapable: "<< AAC << std::endl;
+		// std::cout << "UniqueNumber: " << UN << " ";
+		// std::cout << "ManufacturerCode: "<< MC << " ";
+		// std::cout << "DeviceInstance: "<< (int)DI << " ";
+		// std::cout << "DeviceFunction: "<< (int)DF << " ";
+		// std::cout << "DeviceClass: "<< (int)DC << " ";
+		// std::cout << "SystemInstance: "<< (int)SI << " ";
+		// std::cout << "IndustryCode: "<< (int)IC << " ";
+		// std::cout << "ArbitraryAddressCapable: "<< AAC << std::endl;
+		Serial.print("UniqueNumber: ");				Serial.print(UN);
+		Serial.print(" ManufacturerCode: ");		Serial.print(MC);
+		Serial.print(" DeviceInstance: ");			Serial.print((int)DI);
+		Serial.print(" DeviceFunction:  ");			Serial.print((int)DF);
+		Serial.print(" DeviceClass:  ");			Serial.print((int)DC);
+		Serial.print(" SystemInstance:  ");			Serial.print((int)SI);
+		Serial.print(" IndustryCode:  ");			Serial.print((int)IC);
+		Serial.print(" ArbitraryAddressCapable:  ");Serial.println(AAC);
 
 	}
 	else if(NMsg.PGN == 130306)
@@ -113,10 +141,14 @@ void PrintNMEAMsg(N2kMsg &NMsg)
 		uint8_t SID, Ref;
 		float WS, WA;
 		ParsePGN130306(NMsg, SID, WS, WA, Ref);
-		std::cout << "SID: " << (int)SID << " ";
-		std::cout << "Windspeed: "<< WS << " ";
-		std::cout << "Windangle: "<< WA << " ";
-		std::cout << "Reference: "<< (int)Ref << std::endl;
+		// std::cout << "SID: " << (int)SID << " ";
+		// std::cout << "Windspeed: "<< WS << " ";
+		// std::cout << "Windangle: "<< WA << " ";
+		// std::cout << "Reference: "<< (int)Ref << std::endl;
+		Serial.print("SID:  ");			Serial.print((int)SID);
+		Serial.print(" Windspeed:  ");	Serial.print(WS);
+		Serial.print(" Windangle:  ");	Serial.print(WA);
+		Serial.print(" Reference:  ");	Serial.println((int)Ref);
 
 	}
 	else if(NMsg.PGN == 130311)

@@ -1,5 +1,3 @@
-//#include <stdint.h>
-#include <iostream>
 #include <cstdio>
 #include "global.h"
 #include "mcp2515.h"
@@ -31,6 +29,58 @@ bool NMEA2000Bus::IsFastPackage(const N2kMsg &NMsg)
 	return false;
 }
 
+bool
+VecN2kMsg::PushBack(N2kMsg NMsg)
+{
+	if(Num != 100)
+	{
+		++Num;
+		Data[In++] = NMsg;
+		if(In == 100)
+			In = 0;
+		return true;
+	}
+	else
+		return false;
+}
+bool
+VecN2kMsg::PopFront(N2kMsg NMsg)
+{
+	if(Num != 0)
+	{
+		--Num;
+		Data[Out++] = NMsg;
+		if(Out == 100)
+			Out = 0;
+		return true;
+	}
+	else
+		return false;
+}
+IDsID &
+MapFast::Get(MapKey Key)
+{
+	int FirstAvaliable = -1;
+	{
+		for(int i = 0; i < 100; ++i)
+		{
+			if(Data[i].Empty)
+			{
+				if(FirstAvaliable == -1)
+				{
+					FirstAvaliable = i;
+				}
+			}
+			else if(Data[i].Key == Key)
+			{
+				return Data[i];
+			}
+		}
+	}
+	return Data[FirstAvaliable];
+
+}
+
 int NMEA2000Bus::GetN2kMsg()		//-1: no message avaliable, 0: fast pakage, 1: message in que
 {
 	CanMsg Msg;
@@ -41,10 +91,11 @@ int NMEA2000Bus::GetN2kMsg()		//-1: no message avaliable, 0: fast pakage, 1: mes
 		if(IsFastPackage(NMsg))
 		{
 			bool FullMsg = ParseFastPKG(Msg, NMsg);
-			MessageQue2_.push_back(Msg);
+			//MessageQue2_.push_back(Msg);
 			if(FullMsg)							//if we have received the whole message
 			{
-				MessageQue_.push_back(NMsg);
+				//MessageQue_.push_back(NMsg);
+				MessageQue_.PushBack(NMsg);
 				return 1;
 			}
 			else
@@ -55,12 +106,13 @@ int NMEA2000Bus::GetN2kMsg()		//-1: no message avaliable, 0: fast pakage, 1: mes
 		else
 		{
 			NMsg.DataLen = Msg.header.length;		//Single frame message
-			NMsg.Data.resize(Msg.header.length);
+			//NMsg.Data.resize(Msg.header.length);
 			for(int i = 0; i < 8; ++i)
 			{
 				NMsg.Data[i] = Msg.data[i];
 			}
-			MessageQue_.push_back(NMsg);
+			//MessageQue_.push_back(NMsg);
+			MessageQue_.PushBack(NMsg);
 			return 1;
 		}
 	}
@@ -69,35 +121,46 @@ int NMEA2000Bus::GetN2kMsg()		//-1: no message avaliable, 0: fast pakage, 1: mes
 
 bool NMEA2000Bus::ParseFastPKG(CanMsg &Msg, N2kMsg &NMsg)		//return true and overwrite the NMsg if we have received the whole message
 {
-	IDsID Key = IDsID(Msg.id, Msg.data[0]&0xE0);		//message ID and sequence ID
+	//IDsID Key = IDsID(Msg.id, Msg.data[0]&0xE0);		//message ID and sequence ID
+	MapKey Key;
+	Key.ID = Msg.id;
+	Key.sID = Msg.data[0]&0xE0;
 	uint8_t SequenceNumber = Msg.data[0]&0x1F;
 
-	auto it = BytesLeft_.find(Key);
-	if(it != BytesLeft_.end())				//have parts of the message already
+	//auto it = BytesLeft_.find(Key);
+	IDsID PKG = FastPKG_.Get(Key);
+	//if(it != BytesLeft_.end())				//have parts of the message already
+	if(!PKG.Empty)								//have parts of the message already
 	{
+		//int &BL = it->second;
+		int &BL = PKG.BytesLeft;
 #ifdef VERBOSE
-		std::cout << "Fast package, SID: "<< (int)(Msg.data[0]&0xE0) <<", SequenceNumber: " << (int)SequenceNumber << ", Bytesleft: " << (int)it->second << std::endl;
+		std::cout << "Fast package, SID: "<< (int)(Msg.data[0]&0xE0) <<", SequenceNumber: " << (int)SequenceNumber << ", Bytesleft: " << BL << std::endl;
 #endif
 		int LastByte;
-		if(it->second >= 7)		//check if less than 7 bytes left, 1st byte is the sequence ID and Sequence number followed by 7 bytes of data
+		if(BL >= 7)		//check if less than 7 bytes left, 1st byte is the sequence ID and Sequence number followed by 7 bytes of data
 		{
 			LastByte = 8;
 		}
 		else
 		{
-			LastByte = it->second +1;
+			LastByte = BL +1;
 		}
 
 		for(int i = 1; i < LastByte; ++i)
 		{
-			FastPKG_[Key].Data[6+(SequenceNumber-1)*7 +i] = Msg.data[i];
+			//FastPKG_[Key].Data[6+(SequenceNumber-1)*7 +i] = Msg.data[i];
+			PKG.NMsg.Data[6+(SequenceNumber-1)*7 +i] = Msg.data[i];
 		}
-		it->second -= 7;				//decrease bytes left
+		BL -= 7;						//decrease bytes left
 
-		if(it->second <= 0)				//have the whole message
+		if(BL <= 0)						//have the whole message
 		{
-			NMsg = FastPKG_[Key];
-			FastPKG_.erase(Key);
+			//NMsg = FastPKG_[Key];
+			NMsg = PKG.NMsg;
+			//FastPKG_.erase(Key);
+			PKG.Empty = true;
+			--FastPKG_.Num;
 			return true;
 		}
 		else
@@ -109,7 +172,7 @@ bool NMEA2000Bus::ParseFastPKG(CanMsg &Msg, N2kMsg &NMsg)		//return true and ove
 	{
 		uint8_t BytesInMsg = Msg.data[1];
 		NMsg.DataLen = BytesInMsg;
-		NMsg.Data.resize(BytesInMsg);
+		//NMsg.Data.resize(BytesInMsg);
 		for(int i = 2; i < 8; ++i)
 		{
 			NMsg.Data[i-2] = Msg.data[i];
@@ -123,8 +186,12 @@ bool NMEA2000Bus::ParseFastPKG(CanMsg &Msg, N2kMsg &NMsg)		//return true and ove
 		}
 		else
 		{
-			BytesLeft_[Key] = BytesInMsg-6;		//how many bytes left
-			FastPKG_[Key] = NMsg;
+			//BytesLeft_[Key] = BytesInMsg-6;		//how many bytes left
+			//FastPKG_[Key] = NMsg;
+			PKG.BytesLeft = BytesInMsg-6;
+			PKG.NMsg = NMsg;
+			PKG.Empty = false;
+			++FastPKG_.Num;
 			return false;
 		}
 	}
@@ -215,7 +282,7 @@ bool CanbusClass::Init(int SPISpeed)
 	//if(wiringPiSPISetup(CHANNEL, SPISpeed) == -1)	//channel, SPI speed
 
 	SPI.begin();
-	
+
 
 // 	if(wiringPiSPISetup(CHANNEL, SPISpeed) == -1)	//channel, SPI speed
 // 	{

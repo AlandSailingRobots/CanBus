@@ -3,11 +3,54 @@
 
 #include "mcp2515.h"
 #include "MsgParsing.h"
-#include <vector>
-#include <map>
-#include <tuple>
+//#include <vector>
+//#include <map>
+//#include <tuple>
 
-typedef std::tuple<uint32_t,uint8_t> IDsID;
+//typedef std::tuple<uint32_t,uint8_t> IDsID;
+struct MapKey
+{
+	uint32_t ID;
+	uint8_t sID;
+	inline bool operator==(const MapKey& right)
+	{
+		return(ID == right.ID && sID == right.sID);
+	}
+};
+
+struct IDsID
+{
+	MapKey Key;
+	N2kMsg NMsg;
+	bool Empty = true;
+	int BytesLeft;
+};
+struct VecStatus
+{
+	int NumMQ_;
+	int MQi_;
+	int MQr_;
+};
+
+class VecN2kMsg					//circular buffer
+{
+public:
+	bool PushBack(N2kMsg NMsg);
+	bool PopFront(N2kMsg NMsg);
+
+	N2kMsg Data[100];
+	int Num = 0;
+	int In = 0;
+	int Out = 0;
+};
+class MapFast
+{
+public:
+	IDsID &Get(MapKey Key);
+	IDsID Data[100];
+	int Num = 0;
+};
+
 
 class CanbusClass
 {
@@ -36,7 +79,6 @@ public:
 	NMEA2000Bus() {};
 	bool Init(int SPISpeed);
 	uint8_t CheckForMessages();
-
 	void CreateN2kMsg(N2kMsg &NMsg, uint8_t Dest);
 	bool SendMessage(N2kMsg &NMsg);
 	int GetN2kMsg();
@@ -47,10 +89,13 @@ public:
 	//void SendISORequest(uint32_t PGN, uint8_t Destination);
 	//void SendISOAddressClaim(uint8_t Address, uint8_t Destination);
 
-	std::map<IDsID, N2kMsg> FastPKG_;
-	std::map<IDsID, int> BytesLeft_;		//< <MessageId, sequence id>, Bytes left>
-	std::vector<N2kMsg> MessageQue_;
-	std::vector<CanMsg> MessageQue2_;
+	// std::map<IDsID, N2kMsg> FastPKG_;
+	// std::map<IDsID, int> BytesLeft_;		//< <MessageId, sequence id>, Bytes left>
+	// std::vector<N2kMsg> MessageQue_;
+	// std::vector<CanMsg> MessageQue2_;
+
+	MapFast FastPKG_;
+	VecN2kMsg MessageQue_;
 
 	CanbusClass Canbus;
 
