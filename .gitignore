@@ -1,5 +1,5 @@
 /CANBus_logger.run
 /.project
-*.o
 /build
+*.o
 /log.txt
