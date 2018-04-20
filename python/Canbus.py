@@ -12,7 +12,11 @@ class Canbus ():
         return MCP2515_GetMessage(0)
     
     def CheckForMessages(self):
-        return MCP2515_CheckMessage()
+        if (MCP2515_CheckMessage() == 0):
+            return False
+        else
+            return True
+        
     
     def Init(self, SPISpeed):
         wiringPiSetup()
@@ -23,3 +27,5 @@ class Canbus ():
             print ("SPI Setup successfull")
             return MCP2515_Init()
         
+
+
