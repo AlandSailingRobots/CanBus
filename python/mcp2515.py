@@ -2,6 +2,8 @@ from mcp2515_defs import *
 from MsgParsing import *
 
 import time
+from wiringpi import *
+
 
 def MCP2515_SendByte(Data):
     if type(Data) != type(b'x00'):

@@ -1,4 +1,5 @@
 from mcp2515 import *
+from wiringpi import *
 
 class Canbus ():
     def __init__(self):
