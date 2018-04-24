@@ -69,7 +69,7 @@ export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 # Source Files
 ###############################################################################
 
-SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp NMEA2k.cpp 
+SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp CANBUS_Logger.cpp 
 
 
 OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))

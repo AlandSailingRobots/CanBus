@@ -53,10 +53,11 @@ def MCP2515_BitModify(Address, Mask, Data):
 def MCP2515_Init():
     MCP2515_SendByte(SPI_RESET)
     print("Waiting for CAN bus to restart")
-    time.sleep(0.01)
+    time.sleep(0.1)
     
     ReadWrite = bytes()
     ReadWrite += SPI_WRITE + CNF3 + b'x05' + b'xf1' + b'x41' + bytes([((1<<RX1IE)|(1<<RX0IE))])
+    print(ReadWrite)
     retLen, retData = wiringPiSPIDataRW(CHANNEL,ReadWrite)
     if(MCP2515_Read(CNF1) != b'x41'):
         print ("Chip not accessible")

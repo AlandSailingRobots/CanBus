@@ -83,7 +83,11 @@ bool MCP2515_Init()
 	ReadWrite[3] = 0xf1;										//CNF2
 	ReadWrite[4] = 0x41;										//CNF1
 
-	ReadWrite[5] = (1<<RX1IE)|(1<<RX0IE);		// activate interrupts				
+	ReadWrite[5] = (1<<RX1IE)|(1<<RX0IE);
+#ifdef VERBOSE
+	std::cout << ReadWrite << "\n";
+#endif
+			// activate interrupts
 	wiringPiSPIDataRW(CHANNEL, ReadWrite, 6);
 
 	// test if we could read back the value => is the chip accessible?
