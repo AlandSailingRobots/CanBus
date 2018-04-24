@@ -85,7 +85,7 @@ bool MCP2515_Init()
 
 	ReadWrite[5] = (1<<RX1IE)|(1<<RX0IE);
 #ifdef VERBOSE
-	std::cout << ReadWrite << "\n";
+	std::cout << hexStr(&ReadWrite, 6) << "\n";
 #endif
 			// activate interrupts
 	wiringPiSPIDataRW(CHANNEL, ReadWrite, 6);
@@ -344,4 +344,18 @@ void MCP2515_OutputInfo()
 	std::cout << "Pin control and status\n";
 	std::cout << "B2RTS\tB1RTS\tB0RTS\tB2RTSM\tB1RTSM\tB0RTSM\n";
 	std::cout << ((TXRTS>>5)&1) <<'\t'<< ((TXRTS>>4)&1) <<'\t'<< ((TXRTS>>3)&1) <<'\t'<< ((CTRL>>2)&1) <<'\t'<< ((TXRTS>>1)&1) <<'\t'<< (TXRTS&1) <<std::endl;
+}
+
+
+constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+std::string hexStr(uint8_t *data[], int len)
+{
+  std::string s(len * 2, ' ');
+  for (int i = 0; i < len; ++i) {
+    s[2 * i]     = hexmap[(data[i] & 0xF0) >> 4];
+    s[2 * i + 1] = hexmap[data[i] & 0x0F];
+  }
+  return s;
 }
