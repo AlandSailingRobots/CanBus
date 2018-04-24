@@ -14,7 +14,7 @@ class Canbus ():
     def CheckForMessages(self):
         if (MCP2515_CheckMessage() == 0):
             return False
-        else
+        else:
             return True
         
     

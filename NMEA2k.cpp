@@ -4,6 +4,8 @@
 #include <fstream>
 #include <csignal>
 
+#define VERBOSE true
+
 bool Running = true;
 void SHandler(int sig)
 {

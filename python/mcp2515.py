@@ -50,7 +50,7 @@ def MCP2515_BitModify(Address, Mask, Data):
     ReadWrite += SPI_BIT_MODIFY + Address + Mask + Data
     retLen, retData = wiringPiSPIDataRW(CHANNEL,ReadWrite)
     
-def MCP_Init():
+def MCP2515_Init():
     MCP2515_SendByte(SPI_RESET)
     print("Waiting for CAN bus to restart")
     time.sleep(0.01)
