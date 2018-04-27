@@ -37,9 +37,11 @@ export CXX					= g++
 export SIZE             	= size
 
 
+export USE_MOCK = 0
+
 export MKDIR_P				= mkdir -p
 
-
+export DEFINES 				= -DMOCK=$(USE_MOCK)
 
 
 ###############################################################################
@@ -73,6 +75,7 @@ export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 ###############################################################################
 
 export CORE_SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp 
+export MOCK_SRC							= mockCanbus.cpp MsgParsing.cpp
 
 export OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 ###############################################################################
@@ -102,7 +105,7 @@ clean:
 
 ## Displays this help text
 help:
-	@echo -e '\nUsage: make [target] [ext variable 1] [ext variable 2]'
+	@echo -e '\nUsage: make [target] [ext variable 1] '
 	@echo -e '\nAvailable targets:'
 
 #	$(info Available targets: )
@@ -119,5 +122,4 @@ help:
 	$(MAKEFILE_LIST) | column -ts:
 
 	@echo -e '\nExternal Variables:'
-	@echo -e '\tUSE_SIM = 1:Use with simulator	0: Without (default)'
-	@echo -e '\tUSE_LNM = 1:Voter System	0: Line-follow (default)'
+	@echo -e '\tUSE_MOCK = 1:Use with CANmock	0: Without (default)'

@@ -1,6 +1,13 @@
 
 
-SRC	 			= $(CORE_SRC) CANBUSToPipe.cpp	
+
+
+SRC	 			= CANBUSToPipe.cpp
+ifeq ($(USE_MOCK),1)
+SRC				+= $(MOCK_SRC)
+else
+SRC 			+= $(CORE_SRC) 	
+endif
 
 
 

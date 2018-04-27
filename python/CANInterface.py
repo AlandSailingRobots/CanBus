@@ -13,17 +13,15 @@ class pipeInterface():
             stdout=subprocess.PIPE)
         self.filter = [701, 167576096]
         self.filtering = False
+        self.startSeq = ["fb", "fa", "cb"]
+        self.stopSeq = ["cb", "fa", "fb"]
         
-
     def readCanMsg (self):
         canId  = b''
         while (len (canId) < 3):
             canId += self.proc.stdout.read(1)
         while (self.isStop(canId[-3:]) == False):
             canId += self.proc.stdout.read(1)
-        
-        print (canId)
-        return
         canId = int(canId[:-3].decode("utf-8"))
         
         if (canId not in self.canIds):
@@ -34,18 +32,20 @@ class pipeInterface():
             print(canId)
         
     def isStart(self, seq):
-        if ((seq[0] == 251) and (seq[1]  == 250) and (seq[2] == 203)):
-            #print ("IDENTFEIED START")
-            return True
-        else:
-            return False
-        
+        for i in range(len(seq)):
+            if (seq[i].encode("hex") != self.startSeq[i]):
+                return False
+        #print ("IDENTFEIED START")
+        return True
+      
+
     def isStop(self, seq):
-        if ((seq[2] == 251) and (seq[1]  == 250) and (seq[0] == 203)):
-            #print ("IDENTFEIED STOP")
-            return True
-        else:
-            return False
+        for i in range(len(seq)):
+            if (seq[i].encode("hex") != self.stopSeq[i]):
+                return False
+        #print ("IDENTFEIED STOP")
+        return True
+
     
     def run(self):
         
@@ -63,7 +63,7 @@ class pipeInterface():
                         self.buff = self.buff[:-3]
                         self.readCanMsg() 
                         
-            print(self.buff[:-1].decode("utf-8")) 
+            print(self.buff[:-1]) 
 
         
     
