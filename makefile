@@ -59,8 +59,11 @@ export INC_DIR         	 	= -I./ -I./Libs
 # Target Output
 ###############################################################################
 
-export EXECUTABLE           = CANBus_logger.run
 
+
+export LOGGER_EXEC 			= CANBus-logger.run
+
+export PIPE_EXCE			= CANBus-pipe.run
 
 export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 
@@ -69,10 +72,9 @@ export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 # Source Files
 ###############################################################################
 
-SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp CANBUS_Logger.cpp 
+export CORE_SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp 
 
-
-OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
+export OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 ###############################################################################
 # Rules
 ###############################################################################
@@ -80,34 +82,21 @@ OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 .PHONY: clean help
 
 ## Default, same as make ASPire
-all: $(EXECUTABLE) stats
+all: 
+	$(MAKE) Logger
 
-# Link and build
-$(EXECUTABLE): $(OBJECTS)
-	rm -f $(OBJECT_FILE)
-	@echo -n " " $(OBJECTS) >> $(OBJECT_FILE)
-	@echo Linking object files
-	$(CXX) $(LDFLAGS) @$(OBJECT_FILE) -Wl,-rpath=./ -o $@ $(LIBS)
-
-# Compile CPP files into the build folder
-$(BUILD_DIR)/%.o:$(SRC_DIR)/%.cpp
-	@mkdir -p $(dir $@)
-	@echo Compiling CPP File: $@
-	@$(CXX) -c $(CPPFLAGS) $(INC_DIR) -o ./$@ $< $(DEFINES) $(LIBS)
-
-stats:$(EXECUTABLE)
-	@echo Final executable size:
-	$(SIZE) $(EXECUTABLE)
-#  Create the directories needed
-$(BUILD_DIR):
-	@$(MKDIR_P) $(BUILD_DIR)
-
+logger:
+	$(MAKE) -f logger.mk
+	
+pipe:
+	$(MAKE) -f pipe.mk
 
 ## Remove object files and executables
 clean:
 	@echo Removing existing object files and executable
 	-@rm -rd $(BUILD_DIR)
-	-@rm $(EXECUTABLE)
+	-@rm $(LOGGER_EXCE)
+	-@rm $(PIPE_EXCE)
 	@echo DONE
 
 

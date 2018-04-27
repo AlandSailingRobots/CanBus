@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 
+
 #include "global.h"
 #include "mcp2515.h"
 #include "mcp2515_defs.h"
@@ -84,15 +85,11 @@ bool MCP2515_Init()
 	ReadWrite[4] = 0x41;										//CNF1
 
 	ReadWrite[5] = (1<<RX1IE)|(1<<RX0IE);
-#ifdef VERBOSE
-	std::cout << hexStr(&ReadWrite, 6) << "\n";
-#endif
 			// activate interrupts
 	wiringPiSPIDataRW(CHANNEL, ReadWrite, 6);
 
 	// test if we could read back the value => is the chip accessible?
-	
-	if(MCP2515_Read(CNF1) != 0x41)
+	if( MCP2515_Read(CNF1) != 0x41)
 	{
 #ifdef VERBOSE
 		std::cout << "Chip not accessible\n";
@@ -347,15 +344,5 @@ void MCP2515_OutputInfo()
 }
 
 
-constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-std::string hexStr(uint8_t *data[], int len)
-{
-  std::string s(len * 2, ' ');
-  for (int i = 0; i < len; ++i) {
-    s[2 * i]     = hexmap[(data[i] & 0xF0) >> 4];
-    s[2 * i + 1] = hexmap[data[i] & 0x0F];
-  }
-  return s;
-}
+

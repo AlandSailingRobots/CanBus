@@ -2,6 +2,7 @@
 #define	MCP2515_H
 
 #include <stdint.h>
+#include <string>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 #include "mcp2515_defs.h"
@@ -39,6 +40,5 @@ uint8_t MCP2515_SendMessage(CanMsg *message, uint8_t MsgAddress);
 
 void MCP2515_OutputInfo();
 
-std::string hexStr (uint8_t *data[], int len);
 
 #endif	// MCP2515_H

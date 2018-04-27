@@ -1,0 +1,29 @@
+
+
+SRC	 			= $(CORE_SRC) CANBUSToPipe.cpp	
+
+
+
+OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
+
+
+all: $(PIPE_EXCE) stats
+# Link and build
+$(PIPE_EXCE): $(OBJECTS)
+	rm -f $(OBJECT_FILE)
+	@echo -n " " $(OBJECTS) >> $(OBJECT_FILE)
+	@echo Linking object files
+	$(CXX) $(LDFLAGS) @$(OBJECT_FILE) -Wl,-rpath=./ -o $@ $(LIBS)
+
+# Compile CPP files into the build folder
+$(BUILD_DIR)/%.o:$(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	@echo Compiling CPP File: $@
+	@$(CXX) -c $(CPPFLAGS) $(INC_DIR) -o ./$@ $< $(DEFINES) $(LIBS)
+
+stats:$(PIPE_EXCE)
+	@echo Final executable size:
+	$(SIZE) $(PIPE_EXCE)
+#  Create the directories needed
+$(BUILD_DIR):
+	@$(MKDIR_P) $(BUILD_DIR)
