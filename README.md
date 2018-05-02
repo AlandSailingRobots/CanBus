@@ -1,9 +1,12 @@
-# **This repository is no longer active.**
+# **CAN-Bus repository**
 
-This repository is all messed up, combined with Arduino specific code and std c++ libraries that Arduino do not support.
+Collected most files that relates to the CAN-system used in the project. The main files used by the ASPire system can be found in the sailingrobot repo. These are adapted to specific tasks on ASPire on either arduino or raspberry pi: 
 
-All the relevant and updated files are located here:
+* [CanBus Arduino](https://github.com/AlandSailingRobots/sailingrobot/tree/develop/ArduinoSketches/libraries)
 
-* [CanBus Arduino](https://github.com/AlandSailingRobots/sailingrobot/tree/canbus_cleanup/ArduinoSketches/libraries)
+* [CanBus RPI](https://github.com/AlandSailingRobots/sailingrobot/tree/develop/NavigationSystem/Hardwares/CAN_Services)
 
-* [CanBus RPI](https://github.com/AlandSailingRobots/sailingrobot/tree/canbus_cleanup/NavigationSystem/Hardwares/CAN_Services)
+* [CanBus Commons](https://github.com/AlandSailingRobots/CanBusCommon)
+
+In this repo thera are the original files created for interacting with a Canbus. There are also two loggers, one to run with cpp on a RPi and one with python that can be runed either on a RPi or with a Arduino and serial connection. Details can be found in specific directories.
+
