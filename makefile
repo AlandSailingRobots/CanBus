@@ -65,7 +65,7 @@ export INC_DIR         	 	= -I./ -I./Libs
 
 export LOGGER_EXEC 			= CANBus-logger.run
 
-export PIPE_EXCE			= CANBus-pipe.run
+export PIPE_EXEC			= CANBus-pipe.run
 
 export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 
@@ -74,8 +74,9 @@ export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 # Source Files
 ###############################################################################
 
-export CORE_SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp 
-export MOCK_SRC							= mockCanbus.cpp MsgParsing.cpp
+export CORE_SRC 						= CanbusRPi/Canbus.cpp CanbusRPi/mcp2515.cpp \
+									CanbusRPi/MsgParsing.cpp 
+export MOCK_SRC							= mockCanbus.cpp CanbusRPi/MsgParsing.cpp
 
 export OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 ###############################################################################
@@ -86,7 +87,7 @@ export OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 
 ## Default, same as make ASPire
 all: 
-	$(MAKE) Logger
+	$(MAKE) logger
 
 logger:
 	$(MAKE) -f logger.mk
@@ -98,8 +99,8 @@ pipe:
 clean:
 	@echo Removing existing object files and executable
 	-@rm -rd $(BUILD_DIR)
-	-@rm $(LOGGER_EXCE)
-	-@rm $(PIPE_EXCE)
+	-@rm $(LOGGER_EXEC)
+	-@rm $(PIPE_EXEC)
 	@echo DONE
 
 
