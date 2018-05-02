@@ -6,7 +6,7 @@ Python logger that can log all CAN messages it detects or filter out messages. C
 Needs to have a cpp pipe conection. Crate with in above directory:
 ```shell
 make pipe USE_MOCK=0
-´´´ 
+```
 If USE_MOCK=1 then the logger is runed with a mock canbus for debugging the logger.
 
 * Arduino:
