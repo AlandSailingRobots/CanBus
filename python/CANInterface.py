@@ -18,10 +18,13 @@ class CANInterface():
         
     def readCanMsg (self):
         byteId = ""
+        data = []
         for i in range(4):
             byteId = self.connection.read(1) + byteId
         intId = int (byteId.encode("hex"), 16)
-        message = CanMsg(intId)
+        for n in range (8):
+            data.append(self.connection.read(1).encode("hex"))
+        message = CanMsg(intId, data)
         self.processCanMsg(message)
         
             
@@ -41,23 +44,23 @@ class CANInterface():
         #print ("IDENTFEIED START")
         return True
       
-
-    def isStop(self, seq):
-        for i in range(len(seq)):
-            if (seq[i].encode("hex") != self.stopSeq[i]):
-                return False
-        #print ("IDENTFEIED STOP")
-        return True
     
     def initLog(self):
         self.fileName = "logs/CanBus_" + time.strftime("%Y%b%d%H%M%S", time.localtime()) + ".log"
         file = open(self.fileName, 'w')
+        file.write("[Time HH:MM:SS    messageID    dataBytes[7 ... 0]]\n")
         file.close()
     
     def logCanMsg(self, message):
         file = open(self.fileName, 'a')
-        file.write(time.strftime("%H:%M:%S", time.localtime()) + "    ")
-        file.write(str (message.id))
+        toWrite = time.strftime("%H:%M:%S", time.localtime())
+        file.write(toWrite.rjust(14))
+        toWrite = str (message.id)
+        file.write(toWrite.rjust(13))
+        toWrite = ""
+        for b in message.data:
+            toWrite = b + toWrite
+        file.write(toWrite.rjust(22))    
         file.write('\n')
         file.close()
         

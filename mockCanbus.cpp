@@ -31,6 +31,9 @@ bool CanbusClass::GetMessage(CanMsg *Msg){
 	{
 		Msg->id = 1244343;
 	}
+	Msg->data[0] = 0xcb;
+	Msg->data[3] = 0x92;
+	Msg->data[5] = 0x75;
 	return true;
 
 }

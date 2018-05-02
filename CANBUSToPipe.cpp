@@ -21,6 +21,11 @@ void printIntAsBytes(uint32_t integer){
 
 }
 
+void printCanData(CanMsg canMsg){
+	for (int i; i < 8; i++)
+		std::cout << canMsg.data[i];
+}
+
 
 int main()
 {
@@ -43,7 +48,8 @@ int main()
 			canbus.GetMessage(&canMsg);
 			std::cout << msgWrapper[0] << msgWrapper[1] << msgWrapper[2];
 			printIntAsBytes(canMsg.id);
-			std::cout << "Sent ID";
+			printCanData(canMsg);
+			std::cout << "Sent MSG";
 			std::cout << "\n";
 		}
 		fflush(stdout);
