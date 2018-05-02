@@ -11,6 +11,17 @@
 
 
 
+
+void printIntAsBytes(uint32_t integer){
+	uint8_t x;
+	for (int n= 0; n < 4; n ++){
+		x = (integer >> (8*n)) & 0xff;
+		std::cout << std::dec << x;
+	}
+
+}
+
+
 int main()
 {
 	std::cout << "***Started CAN-bus pipe***\n";
@@ -26,18 +37,14 @@ int main()
 	msgWrapper[1] = 0xfa;
 	msgWrapper[2] = 0xcb;
 
-	//int x = (number >> (8*n)) & 0xff;
-
 	while (true){
 
 		if (canbus.CheckForMessages()){
 			canbus.GetMessage(&canMsg);
 			std::cout << msgWrapper[0] << msgWrapper[1] << msgWrapper[2];
-			std::cout << std::dec << canMsg.id;
-			std::cout << msgWrapper[2] << msgWrapper[1] << msgWrapper[0];
+			printIntAsBytes(canMsg.id);
 			std::cout << "Sent ID";
 			std::cout << "\n";
-			//sfflush(stdout);
 		}
 		fflush(stdout);
 

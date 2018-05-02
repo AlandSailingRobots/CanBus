@@ -6,6 +6,7 @@
 #define SEND_INTERVAL 0.1
 
 bool CanbusClass::Init(int SPISpeed){
+	std::cout << "USING MOCK\n";
 	return true;
 }
 
@@ -28,7 +29,7 @@ bool CanbusClass::GetMessage(CanMsg *Msg){
 	}
 	else
 	{
-		Msg->id = 702;
+		Msg->id = 1244343;
 	}
 	return true;
 
