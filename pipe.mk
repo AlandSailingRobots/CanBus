@@ -14,9 +14,9 @@ endif
 OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 
 
-all: $(PIPE_EXCE) stats
+all: $(PIPE_EXEC) stats
 # Link and build
-$(PIPE_EXCE): $(OBJECTS)
+$(PIPE_EXEC): $(OBJECTS)
 	rm -f $(OBJECT_FILE)
 	@echo -n " " $(OBJECTS) >> $(OBJECT_FILE)
 	@echo Linking object files
@@ -28,9 +28,9 @@ $(BUILD_DIR)/%.o:$(SRC_DIR)/%.cpp
 	@echo Compiling CPP File: $@
 	@$(CXX) -c $(CPPFLAGS) $(INC_DIR) -o ./$@ $< $(DEFINES) $(LIBS)
 
-stats:$(PIPE_EXCE)
+stats:$(PIPE_EXEC)
 	@echo Final executable size:
-	$(SIZE) $(PIPE_EXCE)
+	$(SIZE) $(PIPE_EXEC)
 #  Create the directories needed
 $(BUILD_DIR):
 	@$(MKDIR_P) $(BUILD_DIR)
