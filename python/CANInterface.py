@@ -14,6 +14,7 @@ class CANInterface():
         self.filtering = False
         self.startSeq = ["fb", "fa", "cb"]
         self.stopSeq = ["cb", "fa", "fb"]
+        self.initLog()
         
     def readCanMsg (self):
         byteId = ""
@@ -29,7 +30,7 @@ class CANInterface():
         if (message.id not in self.canIds):
             self.canIds.append(message.id)
             print (self.canIds)
-        
+        self.logCanMsg(message)
         if((self.filtering == False) or (message.id in self.filter)):
             print(message.id)
         
@@ -47,6 +48,19 @@ class CANInterface():
                 return False
         #print ("IDENTFEIED STOP")
         return True
+    
+    def initLog(self):
+        self.fileName = "logs/CanBus_" + time.strftime("%Y%b%d%H%M%S", time.localtime()) + ".log"
+        file = open(self.fileName, 'w')
+        file.close()
+    
+    def logCanMsg(self, message):
+        file = open(self.fileName, 'a')
+        file.write(time.strftime("%H:%M:%S", time.localtime()) + "    ")
+        file.write(str (message.id))
+        file.write('\n')
+        file.close()
+        
 
     
     def run(self):
