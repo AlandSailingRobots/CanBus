@@ -9,7 +9,10 @@
 #include <fstream>
 #include <csignal>
 
-
+	uint8_t msgWrapper[3];
+	msgWrapper[0] = 0xfb;
+	msgWrapper[1] = 0xfa;
+	msgWrapper[2] = 0xcb;
 
 
 void printIntAsBytes(uint32_t integer){
@@ -37,10 +40,7 @@ int main()
 
 	}
 
-	uint8_t msgWrapper[3];
-	msgWrapper[0] = 0xfb;
-	msgWrapper[1] = 0xfa;
-	msgWrapper[2] = 0xcb;
+
 
 	while (true){
 
