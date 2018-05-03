@@ -10,10 +10,11 @@ class CANInterface():
         self.canIds =[]
         #self.connection = PipeConection()
         self.connection = ArduinoConection("/dev/ttyACM0")
-        self.filter = [701, 167576096]
-        self.filtering = False
+        self.printFilter = [701, 167576096]
+        self.printFiltering = False
+        self.logFilter = []
+        self.logFiltering = True
         self.startSeq = ["fb", "fa", "cb"]
-        self.stopSeq = ["cb", "fa", "fb"]
         self.initLog()
         
     def readCanMsg (self):
@@ -33,8 +34,9 @@ class CANInterface():
         if (message.id not in self.canIds):
             self.canIds.append(message.id)
             print (self.canIds)
-        self.logCanMsg(message)
-        if((self.filtering == False) or (message.id in self.filter)):
+        if ((self.logFiltering == False) or (message.id in self.logFilter)):
+            self.logCanMsg(message)
+        if((self.printFiltering == False) or (message.id in self.printFilter)):
             print(message.id)
         
     def isStart(self, seq):
@@ -64,7 +66,11 @@ class CANInterface():
         file.write('\n')
         file.close()
         
-
+    def logCanIds(self):
+        file = open(self.fileName, 'a')
+        file.write("Got the folowing Can ids: ")
+        file.write(str(self.canIds))
+        file.close()
     
     def run(self):
         
@@ -87,8 +93,15 @@ class CANInterface():
         
     
 
-pipe = CANInterface()
-pipe.run()
+def main():
+    pipe = CANInterface()
+    try:
+        pipe.run()
+    finally:
+        pipe.logCanIds()
 
+main()
 
+        
+        
         
