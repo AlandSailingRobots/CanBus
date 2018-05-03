@@ -8,8 +8,8 @@ class CANInterface():
     def __init__(self):
         self.buff = b''
         self.canIds =[]
-        self.connection = PipeConection()
-        #self.connection = ArduinoConection("/dev/ttyACM0")
+        #self.connection = PipeConection()
+        self.connection = ArduinoConection("/dev/ttyACM0")
         self.filter = [701, 167576096]
         self.filtering = False
         self.startSeq = ["fb", "fa", "cb"]

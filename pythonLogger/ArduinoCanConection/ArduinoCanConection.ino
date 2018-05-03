@@ -6,7 +6,7 @@
 CanbusClass Canbus;
 CanMsg msg;
 int chipSelect = 10;
-uint8_t messageWrapper[3] = {0xfb, 0xfb, 0xcb};
+uint8_t messageWrapper[3] = {0xfb, 0xfa, 0xcb};
 
 
 void setup() {
