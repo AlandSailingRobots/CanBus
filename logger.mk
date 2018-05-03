@@ -1,6 +1,6 @@
 
 
-SRC	 			= CANBUS_Logger.cpp  $(CORE_SRC) 	
+SRC	 			= CanbusLogger.cpp  $(CORE_SRC) 	
 
 
 
