@@ -1,5 +1,7 @@
 import serial
 
+
+#Conection to the arduino over serial port
 class ArduinoConection():
     
     def __init__(self,portName):

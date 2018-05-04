@@ -1,6 +1,6 @@
 
 
-
+#Used for geting defines from C headerfile to python
 def getFromFile (file):
     f = open (file, "r")
     ls = []

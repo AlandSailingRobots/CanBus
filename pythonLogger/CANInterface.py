@@ -3,6 +3,7 @@ from PipeConection import *
 from ArduinoConection import *
 from CanMsg import *
 
+#Interface class for logging the CAN-bus can be used with arduino or on a RPi
 class CANInterface():
 
     def __init__(self):
@@ -17,6 +18,8 @@ class CANInterface():
         self.startSeq = ["fb", "fa", "cb"]
         self.initLog()
         
+        
+    #Reads a Msg from the selected conection. Reads 4 bytes that are the ID and 8 that are the raw data.    
     def readCanMsg (self):
         byteId = ""
         data = []
@@ -29,9 +32,9 @@ class CANInterface():
         self.processCanMsg(message)
         
             
-        
+    #Deides if the message is to be printed and/or logged dependig on filter settings.     
     def processCanMsg (self, message):
-        if (message.id not in self.canIds):
+        if (message.id not in self.canIds): #If new message ID
             self.canIds.append(message.id)
             print (self.canIds)
         if ((self.logFiltering == False) or (message.id in self.logFilter)):
@@ -39,6 +42,8 @@ class CANInterface():
         if((self.printFiltering == False) or (message.id in self.printFilter)):
             print(message.id)
         
+      
+     #Identifes if a sequesnse is a predetermined start sequesne   
     def isStart(self, seq):
         for i in range(len(seq)):
             if (seq[i].encode("hex") != self.startSeq[i]):
@@ -46,13 +51,14 @@ class CANInterface():
         #print ("IDENTFEIED START")
         return True
       
-    
+    #Inlitialise log file
     def initLog(self):
         self.fileName = "logs/CanBus_" + time.strftime("%Y%b%d%H%M%S", time.localtime()) + ".log"
         file = open(self.fileName, 'w')
         file.write("[Time HH:MM:SS    messageID    dataBytes[7 ... 0]]\n")
         file.close()
     
+    #Logs message with timestamp
     def logCanMsg(self, message):
         file = open(self.fileName, 'a')
         toWrite = time.strftime("%H:%M:%S", time.localtime())
@@ -66,12 +72,16 @@ class CANInterface():
         file.write('\n')
         file.close()
         
+        
+    #Logs witch messages was found. Used when program terminates    
     def logCanIds(self):
         file = open(self.fileName, 'a')
         file.write("Got the folowing Can ids: ")
         file.write(str(self.canIds))
         file.close()
     
+    
+    #Main loop
     def run(self):
         
         startTime = time.time()

@@ -1,6 +1,6 @@
 import subprocess
 
-
+#Conection to Canbus C++ progam that can be ran on a RPi
 class PipeConection():
     
     def __init__(self):

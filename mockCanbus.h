@@ -1,3 +1,19 @@
+/****************************************************************************************
+ *
+ * File:
+ * 		mockCanbus.h
+ *
+ * Purpose:
+ *      Used to emulate the a the Canbus and mcp2515 files without needing to have the hardware conected
+ *
+ *
+ * Developer Notes:
+ *		Only implemented the checkFor message and getMessage for now.
+ *
+ ***************************************************************************************/
+
+
+
 #ifndef canbus__h
 #define canbus__h
 

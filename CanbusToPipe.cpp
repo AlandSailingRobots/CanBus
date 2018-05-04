@@ -1,3 +1,20 @@
+/****************************************************************************************
+ *
+ * File:
+ * 		CanbusToPipe.cpp
+ *
+ * Purpose:
+ *      Sends all CAN-messages that is received from the bus to standard output
+ *      that is interpreted as a pipe connection in the python script. Can be used with
+ *      mockCanbus
+ *
+ *
+ * Developer Notes:
+ *
+ ***************************************************************************************/
+
+
+
 
 #if MOCK == 1
 	#include "mockCanbus.h"

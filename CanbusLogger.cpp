@@ -1,3 +1,18 @@
+/****************************************************************************************
+ *
+ * File:
+ * 		CanbusLogger.cpp
+ *
+ * Purpose:
+ *      Logger to monitor and log the NMEA2K messages that are on the bus
+ *
+ *
+ * Developer Notes:
+ *
+ ***************************************************************************************/
+
+
+
 #include "CanbusRPi/mcp2515.h"
 #include "CanbusRPi/Canbus.h"
 #include <iostream>

@@ -1,9 +1,22 @@
+/****************************************************************************************
+ *
+ * File:
+ * 		mockCanbus.cpp
+ *
+ * Purpose:
+ *      Used to emulate the a the Canbus and mcp2515 files without needing to have the hardware conected
+ *
+ *
+ * Developer Notes:
+ *
+ ***************************************************************************************/
+
 #include <iostream>
 #include <cstdio>
 #include <stdlib.h>
 #include "mockCanbus.h"
 
-#define SEND_INTERVAL 0.1
+#define SEND_INTERVAL 0.1 //How often a message is created
 
 bool CanbusClass::Init(int SPISpeed){
 	std::cout << "USING MOCK\n";
