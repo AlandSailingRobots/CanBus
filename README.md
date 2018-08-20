@@ -8,5 +8,7 @@ Collected most files that relates to the CAN-system used in the project. The mai
 
 * [CanBus Commons](https://github.com/AlandSailingRobots/CanBusCommon)
 
-In this repo there are the original files created for interacting with a Canbus. There are also two loggers, one to run with cpp on a RPi and one with python that can be runed either on a RPi or with a Arduino and serial connection. Details can be found in specific directories.
+In this repo there are the original files created for interacting with a Canbus. 
+#**Logging**
+There are two logger that can be used. The first one can only be run on a RPi. It is made with
 
