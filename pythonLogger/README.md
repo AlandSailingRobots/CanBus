@@ -1,6 +1,14 @@
 # ** Logger using python**
 
-Python logger that can log all CAN messages it detects or filter out messages. Can be used with arduino interface or rpi interface. Comment in the desired connection. 
+Python logger that can log all CAN messages it detects or filter out messages. Can be used with arduino interface or rpi interface. 
+Comment in the desired connection. 
+
+#**Usage**
+```shell
+python2 CANInterface.py conection [usbPort]
+```
+Conection is the type of conection wanted, 1 for RPi pipe or 2 for Arduino
+usbPort is for witch USBport the Arduino is on 
 
 * RPi pipe:
 Needs to have a cpp pipe conection. Crate with make in above directory:
@@ -11,5 +19,5 @@ If USE_MOCK=1 then the logger is runed with a mock canbus for debugging the logg
 
 * Arduino:
 
-Needs a arduino with can-shield connected and flashed with ArduinoCanConection script. A string with the port of the arduino is added in the constructor of the connection.
+Needs a arduino with can-shield connected and flashed with ArduinoCanConection script. A string with the port of the arduino is added in the constructor of the CANInterface and at start. 
 
