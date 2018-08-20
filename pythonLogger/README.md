@@ -7,6 +7,7 @@ Python logger that can log all CAN messages it detects or filter out messages. F
 python2 CANInterface.py conection [usbPort]
 ```
 Conection is the type of conection wanted, 1 for RPi pipe or 2 for Arduino
+
 usbPort is for witch USBport the Arduino is on 
 
 * RPi pipe:
