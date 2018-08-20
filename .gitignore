@@ -1,5 +1,10 @@
-/CANBus_logger.run
 /.project
+*.pyc
+*.run
+*.log
+/.pydevproject
+*.tmp
 /build
 *.o
 /log.txt
+

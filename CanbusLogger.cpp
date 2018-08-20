@@ -1,8 +1,25 @@
-#include "mcp2515.h"
-#include "Canbus.h"
+/****************************************************************************************
+ *
+ * File:
+ * 		CanbusLogger.cpp
+ *
+ * Purpose:
+ *      Logger to monitor and log the NMEA2K messages that are on the bus
+ *
+ *
+ * Developer Notes:
+ *
+ ***************************************************************************************/
+
+
+
+#include "CanbusRPi/mcp2515.h"
+#include "CanbusRPi/Canbus.h"
 #include <iostream>
 #include <fstream>
 #include <csignal>
+
+#define VERBOSE true
 
 bool Running = true;
 void SHandler(int sig)

@@ -37,9 +37,11 @@ export CXX					= g++
 export SIZE             	= size
 
 
+export USE_MOCK = 0
+
 export MKDIR_P				= mkdir -p
 
-
+export DEFINES 				= -DMOCK=$(USE_MOCK)
 
 
 ###############################################################################
@@ -59,8 +61,11 @@ export INC_DIR         	 	= -I./ -I./Libs
 # Target Output
 ###############################################################################
 
-export EXECUTABLE           = CANBus_logger.run
 
+
+export LOGGER_EXEC 			= CANBus-logger.run
+
+export PIPE_EXEC			= CANBus-pipe.run
 
 export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 
@@ -69,10 +74,11 @@ export OBJECT_FILE          = $(BUILD_DIR)/objects.tmp
 # Source Files
 ###############################################################################
 
-SRC 						= Canbus.cpp mcp2515.cpp MsgParsing.cpp NMEA2k.cpp 
+export CORE_SRC 						= CanbusRPi/Canbus.cpp CanbusRPi/mcp2515.cpp \
+									CanbusRPi/MsgParsing.cpp 
+export MOCK_SRC							= mockCanbus.cpp CanbusRPi/MsgParsing.cpp
 
-
-OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
+export OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 ###############################################################################
 # Rules
 ###############################################################################
@@ -80,40 +86,27 @@ OBJECTS = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 .PHONY: clean help
 
 ## Default, same as make ASPire
-all: $(EXECUTABLE) stats
+all: 
+	$(MAKE) logger
 
-# Link and build
-$(EXECUTABLE): $(OBJECTS)
-	rm -f $(OBJECT_FILE)
-	@echo -n " " $(OBJECTS) >> $(OBJECT_FILE)
-	@echo Linking object files
-	$(CXX) $(LDFLAGS) @$(OBJECT_FILE) -Wl,-rpath=./ -o $@ $(LIBS)
-
-# Compile CPP files into the build folder
-$(BUILD_DIR)/%.o:$(SRC_DIR)/%.cpp
-	@mkdir -p $(dir $@)
-	@echo Compiling CPP File: $@
-	@$(CXX) -c $(CPPFLAGS) $(INC_DIR) -o ./$@ $< $(DEFINES) $(LIBS)
-
-stats:$(EXECUTABLE)
-	@echo Final executable size:
-	$(SIZE) $(EXECUTABLE)
-#  Create the directories needed
-$(BUILD_DIR):
-	@$(MKDIR_P) $(BUILD_DIR)
-
+logger:
+	$(MAKE) -f logger.mk
+	
+pipe:
+	$(MAKE) -f pipe.mk
 
 ## Remove object files and executables
 clean:
 	@echo Removing existing object files and executable
 	-@rm -rd $(BUILD_DIR)
-	-@rm $(EXECUTABLE)
+	-@rm $(LOGGER_EXEC)
+	-@rm $(PIPE_EXEC)
 	@echo DONE
 
 
 ## Displays this help text
 help:
-	@echo -e '\nUsage: make [target] [ext variable 1] [ext variable 2]'
+	@echo -e '\nUsage: make [target] [ext variable 1] '
 	@echo -e '\nAvailable targets:'
 
 #	$(info Available targets: )
@@ -130,5 +123,4 @@ help:
 	$(MAKEFILE_LIST) | column -ts:
 
 	@echo -e '\nExternal Variables:'
-	@echo -e '\tUSE_SIM = 1:Use with simulator	0: Without (default)'
-	@echo -e '\tUSE_LNM = 1:Voter System	0: Line-follow (default)'
+	@echo -e '\tUSE_MOCK = 1:Use with CANmock	0: Without (default)'

@@ -2,12 +2,15 @@
 #include <iostream>
 #include <unistd.h>
 
+
 #include "global.h"
 #include "mcp2515.h"
 #include "mcp2515_defs.h"
 
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
+
+#define VERBOSE true
 
 void MCP2515_SendByte(uint8_t Data)
 {
@@ -81,12 +84,12 @@ bool MCP2515_Init()
 	ReadWrite[3] = 0xf1;										//CNF2
 	ReadWrite[4] = 0x41;										//CNF1
 
-	ReadWrite[5] = (1<<RX1IE)|(1<<RX0IE);		// activate interrupts				
+	ReadWrite[5] = (1<<RX1IE)|(1<<RX0IE);
+			// activate interrupts
 	wiringPiSPIDataRW(CHANNEL, ReadWrite, 6);
 
 	// test if we could read back the value => is the chip accessible?
-	
-	if(MCP2515_Read(CNF1) != 0x41)
+	if( MCP2515_Read(CNF1) != 0x41)
 	{
 #ifdef VERBOSE
 		std::cout << "Chip not accessible\n";
@@ -339,3 +342,7 @@ void MCP2515_OutputInfo()
 	std::cout << "B2RTS\tB1RTS\tB0RTS\tB2RTSM\tB1RTSM\tB0RTSM\n";
 	std::cout << ((TXRTS>>5)&1) <<'\t'<< ((TXRTS>>4)&1) <<'\t'<< ((TXRTS>>3)&1) <<'\t'<< ((CTRL>>2)&1) <<'\t'<< ((TXRTS>>1)&1) <<'\t'<< (TXRTS&1) <<std::endl;
 }
+
+
+
+
