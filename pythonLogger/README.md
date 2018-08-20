@@ -3,7 +3,7 @@
 Python logger that can log all CAN messages it detects or filter out messages. Can be used with arduino interface or rpi interface. Comment in the desired connection. 
 
 * RPi pipe:
-Needs to have a cpp pipe conection. Crate with in above directory:
+Needs to have a cpp pipe conection. Crate with make in above directory:
 ```shell
 make pipe USE_MOCK=0
 ```
