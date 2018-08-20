@@ -1,7 +1,6 @@
 # ** Logger using python**
 
-Python logger that can log all CAN messages it detects or filter out messages. Can be used with arduino interface or rpi interface. 
-Comment in the desired connection. 
+Python logger that can log all CAN messages it detects or filter out messages. Fiter configs are located in the CANInterface.py file. 
 
 #**Usage**
 ```shell
