@@ -2,15 +2,20 @@ import time
 from PipeConection import *
 from ArduinoConection import *
 from CanMsg import *
+import sys
 
 #Interface class for logging the CAN-bus can be used with arduino or on a RPi
 class CANInterface():
 
-    def __init__(self):
+    def __init__(self, decierdedInterface= 1, usbPort = "/dev/ttyUSB0"):
         self.buff = b''
         self.canIds =[]
-        #self.connection = PipeConection()
-        self.connection = ArduinoConection("/dev/ttyACM0")
+        if decierdedInterface == "1":
+            self.connection = PipeConection()
+        elif decierdedInterface == "2":
+            self.connection = ArduinoConection(usbPort)
+        else:
+            self.connection="NONE"
         self.printFilter = [701, 167576096]
         self.printFiltering = False
         self.logFilter = []
@@ -83,7 +88,10 @@ class CANInterface():
     
     #Main loop
     def run(self):
-        
+        if self.connection == "NONE":
+            print("INVALID CONECTION VALUE! Try 1 for RPI or 2 for Arduino")
+            return
+
         startTime = time.time()
         while(True):
         #while (time.time() < startTime + 5):
@@ -103,14 +111,27 @@ class CANInterface():
         
     
 
-def main():
-    pipe = CANInterface()
+def main(decierdedInterface= 1, usbPort = "/dev/ttyUSB0"):
+    pipe = CANInterface(decierdedInterface, usbPort)
     try:
         pipe.run()
     finally:
         pipe.logCanIds()
 
-main()
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print('''USEAGE: python2 CANInterface.py conectionType [usbPort]
+        conectionType == 1 -> cpp-pipe conection (Rpi) 
+        conectionType == 2 -> Arduino conection
+        usbPort = usbport of arudino''')
+    if len(sys.argv) == 2:
+        main(sys.argv[1])
+    if len(sys.argv) >= 3:
+        main(sys.argv[1], sys.argv[2])
+
+
+
+
 
         
         
